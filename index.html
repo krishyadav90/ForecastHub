@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weather Forecast</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+      user-select: none;
+      padding: 20px;
+    }
+
+    .container {
+      background: #ffffffee;
+      padding: 40px 35px;
+      border-radius: 20px;
+      width: 460px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: box-shadow 0.3s ease;
+    }
+    .container:hover {
+      box-shadow: 0 25px 40px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-weight: 600;
+      font-size: 1.8rem;
+      color: #004466;
+      letter-spacing: 1px;
+    }
+
+    #dateTime {
+      font-weight: 500;
+      margin-bottom: 25px;
+      font-size: 1rem;
+      color: #0077cc;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      border: 2px solid #a3c9f1;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.3s ease;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.07);
+    }
+    input[type="text"]:focus {
+      border-color: #0077cc;
+      box-shadow: 0 0 8px #0077ccaa;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(90deg, #0077cc, #004466);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 8px 15px rgba(0, 119, 204, 0.4);
+    }
+    button:hover {
+      background: linear-gradient(90deg, #004466, #0077cc);
+      box-shadow: 0 10px 20px rgba(0, 119, 204, 0.6);
+    }
+
+    #result {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-gap: 22px 18px;
+      justify-items: center;
+    }
+
+    .weather-box {
+      background: #e6f2ff;
+      border-radius: 18px;
+      width: 200px;
+      padding: 22px 18px;
+      box-shadow: 0 8px 20px rgba(0, 119, 204, 0.15);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: default;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .weather-box:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 15px 25px rgba(0, 119, 204, 0.3);
+    }
+
+    .icon {
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      stroke: #0077cc;
+      stroke-width: 1.8;
+      fill: none;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+
+    .weather-text {
+      text-align: left;
+    }
+
+    .weather-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #004466;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .weather-value {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #0077cc;
+      text-transform: capitalize;
+    }
+
+    .error {
+      margin-top: 30px;
+      color: #d9534f;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        width: 100%;
+        padding: 30px 20px;
+      }
+      .weather-box {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Weather Forecast</h2>
+    <div id="dateTime"></div>
+    <input type="text" id="cityInput" placeholder="Enter city name" />
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="result"></div>
+    <div id="error" class="error"></div>
+  </div>
+
+  <script>
+    const apiKey = '1c3c7793907527875502baf7509da81f';
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+      };
+      document.getElementById('dateTime').textContent = now.toLocaleDateString(undefined, options);
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    function createWeatherBox(label, value, iconSvg) {
+      const box = document.createElement('div');
+      box.className = 'weather-box';
+
+      const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      icon.setAttribute("class", "icon");
+      icon.setAttribute("viewBox", "0 0 24 24");
+      icon.innerHTML = iconSvg;
+
+      const textDiv = document.createElement('div');
+      textDiv.className = 'weather-text';
+      textDiv.innerHTML = `<div class="weather-label">${label}</div><div class="weather-value">${value}</div>`;
+
+      box.appendChild(icon);
+      box.appendChild(textDiv);
+      return box;
+    }
+
+    async function getWeather() {
+      const city = document.getElementById('cityInput').value.trim();
+      const resultDiv = document.getElementById('result');
+      const errorDiv = document.getElementById('error');
+      resultDiv.innerHTML = '';
+      errorDiv.textContent = '';
+
+      if (!city) {
+        errorDiv.textContent = 'Please enter a city name.';
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`
+        );
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Invalid API key.');
+          } else if (response.status === 404) {
+            throw new Error('City not found.');
+          } else {
+            throw new Error('Error fetching weather data.');
+          }
+        }
+
+        const data = await response.json();
+
+        // Extract details
+        const temp = data.main.temp.toFixed(1) + ' °C';
+        const humidity = data.main.humidity + '%';
+        const pressure = data.main.pressure + ' hPa';
+        const windSpeed = data.wind.speed.toFixed(1) + ' m/s';
+        const weatherDesc = data.weather[0].description;
+        const cityName = data.name + ', ' + data.sys.country;
+
+        // SVG icons
+        const icons = {
+          location: `<path d="M12 21s-6-5.686-6-10a6 6 0 1 1 12 0c0 4.314-6 10-6 10z"/><circle cx="12" cy="11" r="2"/>`,
+          temperature: `<path d="M12 2a4 4 0 0 1 4 4v8a4 4 0 1 1-8 0V6a4 4 0 0 1 4-4z"/><line x1="12" y1="14" x2="12" y2="22"/>`,
+          humidity: `<path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13z"/>`,
+          pressure: `<circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="16" y1="16" x2="12" y2="12"/><line x1="8" y1="16" x2="12" y2="12"/>`,
+          wind: `<path d="M4 12h16"/><path d="M10 8l6 4-6 4"/>`,
+          weather: `<circle cx="12" cy="12" r="5"/><path d="M12 7v10M7 12h10"/>`
+        };
+
+        const boxes = [];
+        boxes.push(createWeatherBox('Location', cityName, icons.location));
+        boxes.push(createWeatherBox('Temperature', temp, icons.temperature));
+        boxes.push(createWeatherBox('Weather', weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1), icons.weather));
+        boxes.push(createWeatherBox('Humidity', humidity, icons.humidity));
+        boxes.push(createWeatherBox('Pressure', pressure, icons.pressure));
+        boxes.push(createWeatherBox('Wind Speed', windSpeed, icons.wind));
+
+        boxes.forEach(box => resultDiv.appendChild(box));
+
+      } catch (error) {
+        errorDiv.textContent = error.message;
+      }
+    }
+  </script>
+</body>
+</html>
