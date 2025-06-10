@@ -401,6 +401,28 @@
       background: #6b7280;
     }
 
+    .footer {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      padding: 1rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 1rem;
+      box-shadow: var(--shadow);
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      z-index: 10;
+      width: 200px;
+      text-align: center;
+    }
+
+    body.dark .footer {
+      background: var(--card-bg-dark);
+      box-shadow: var(--shadow-dark);
+      color: var(--text-dark);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -419,11 +441,6 @@
     @keyframes fall {
       0% { transform: translateY(0); opacity: 1; }
       100% { transform: translateY(25px); opacity: 0; }
-    }
-
-    @keyframes drift {
-      0%, 100% { transform: translateX(0) perspective(500px) rotateX(20deg); }
-      50% { transform: translateX(6px) perspective(500px) rotateX(20deg); }
     }
 
     @keyframes spin {
@@ -482,6 +499,11 @@
       .modal-content h3 {
         font-size: 1.25rem;
       }
+      .footer {
+        font-size: 0.75rem;
+        padding: 0.75rem;
+        width: 150px;
+      }
     }
 
     @media (min-width: 501px) and (max-width: 768px) {
@@ -508,6 +530,10 @@
         flex-wrap: wrap;
         gap: 0.5rem;
       }
+      .footer {
+        font-size: 0.875rem;
+        width: 180px;
+      }
     }
   </style>
 </head>
@@ -528,6 +554,7 @@
     <button id="toggleUnitBtn" onclick="toggleUnit()" class="hidden bg-white dark:bg-gray-800 border border-green-500 dark:border-green-600 text-green-600 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 transition" aria-label="Toggle temperature unit">Switch to °F</button>
     <button id="toggleThemeBtn" onclick="toggleTheme()" class="bg-white dark:bg-gray-800 border border-blue-500 dark:border-blue-600 text-blue-600 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-700 transition" aria-label="Toggle theme">🌙 Dark Mode</button>
     <button id="customizeWidgetsBtn" onclick="openWidgetModal()" class="bg-white dark:bg-gray-800 border border-purple-500 dark:border-purple-600 text-purple-600 dark:text-gray-200 hover:bg-purple-100 dark:hover:bg-gray-700 transition" aria-label="Customize widgets">🛠️ Widgets</button>
+    <button id="getLocationBtn" onclick="getWeatherByLocation()" class="bg-white dark:bg-gray-800 border border-teal-500 dark:border-teal-600 text-teal-600 dark:text-teal-200 hover:bg-teal-100 dark:hover:bg-gray-700 transition" aria-label="Use current location">📍 Use Location</button>
   </div>
 
   <div class="container">
@@ -553,6 +580,11 @@
         <button class="save-btn" onclick="saveWidgetSelection()">Save</button>
       </div>
     </div>
+  </div>
+
+  <div id="footer" class="footer">
+    <p>© 2025 ForecastHub</p>
+    <p>Created by Krish Yadav</p>
   </div>
 
   <script>
@@ -598,7 +630,10 @@
         summary: "3-Day Forecast Summary",
         avgTemp: "Avg Temp",
         predominantCondition: "Condition",
-        totalRain: "Total Rain"
+        totalRain: "Total Rain",
+        useLocation: "Use Location",
+        errorGeolocation: "Geolocation is not supported or permission denied",
+        errorReverseGeocoding: "Unable to determine city from location"
       },
       ru: {
         title: "Прогноз погоды",
@@ -626,7 +661,10 @@
         summary: "Сводка прогноза на 3 дня",
         avgTemp: "Средняя температура",
         predominantCondition: "Условие",
-        totalRain: "Общие осадки"
+        totalRain: "Общие осадки",
+        useLocation: "Использовать местоположение",
+        errorGeolocation: "Геолокация не поддерживается или доступ запрещён",
+        errorReverseGeocoding: "Невозможно определить город по местоположению"
       },
       ja: {
         title: "天気予報",
@@ -654,7 +692,10 @@
         summary: "3日間予報サマリー",
         avgTemp: "平均気温",
         predominantCondition: "主な天気",
-        totalRain: "総降水量"
+        totalRain: "総降水量",
+        useLocation: "現在地を使用",
+        errorGeolocation: "ジオロケーションがサポートされていないか、許可が拒否されました",
+        errorReverseGeocoding: "位置から都市を特定できません"
       },
       hi: {
         title: "मौसम पूर्वानुमान",
@@ -682,7 +723,10 @@
         summary: "3-दिन का पूर्वानुमान सारांश",
         avgTemp: "औसत तापमान",
         predominantCondition: "स्थिति",
-        totalRain: "कुल वर्षा"
+        totalRain: "कुल वर्षा",
+        useLocation: "वर्तमान स्थान का उपयोग करें",
+        errorGeolocation: "जियोलोकेशन समर्थित नहीं है या अनुमति अस्वीकृत है",
+        errorReverseGeocoding: "स्थान से शहर का निर्धारण नहीं किया जा सका"
       }
     };
 
@@ -845,7 +889,7 @@
       document.getElementById('toggleUnitBtn').textContent = currentUnit === 'metric' ? labels[currentLang].toggleUnitToF : labels[currentLang].toggleUnitToC;
       document.getElementById('toggleThemeBtn').textContent = isDarkMode ? labels[currentLang].toggleThemeToLight : labels[currentLang].toggleThemeToDark;
       document.getElementById('customizeWidgetsBtn').textContent = `🛠️ ${labels[currentLang].customizeWidgets}`;
-      document.getElementById('widgetModalTitle').textContent = labels[currentLang].customizeWidgets;
+      document.getElementById('getLocationBtn').textContent = `📍 ${labels[currentLang].useLocation}`;
       document.getElementById('error').textContent = '';
       renderWidgetModal();
     }
@@ -941,6 +985,68 @@
       } finally {
         getWeatherBtn.disabled = false;
         getWeatherBtn.textContent = labels[currentLang].getWeatherBtn;
+        loadingEl.style.display = 'none';
+      }
+    }
+
+    async function getWeatherByLocation() {
+      const errEl = document.getElementById('error');
+      const getLocationBtn = document.getElementById('getLocationBtn');
+      const toggleUnitBtn = document.getElementById('toggleUnitBtn');
+      const loadingEl = document.getElementById('loading');
+      errEl.textContent = '';
+      getLocationBtn.disabled = true;
+      getLocationBtn.textContent = 'Locating...';
+      loadingEl.style.display = 'block';
+
+      if (!navigator.geolocation) {
+        errEl.textContent = labels[currentLang].errorGeolocation;
+        getLocationBtn.disabled = false;
+        getLocationBtn.textContent = `📍 ${labels[currentLang].useLocation}`;
+        loadingEl.style.display = 'none';
+        stopAutoUpdate();
+        currentWindowStart = null;
+        return;
+      }
+
+      try {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+        const { latitude: lat, longitude: lon } = position.coords;
+
+        // Reverse geocoding to get city name
+        const reverseUrl = `http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
+        const reverseRes = await fetch(reverseUrl);
+        if (!reverseRes.ok) throw new Error("Reverse geocoding failed");
+        const reverseData = await reverseRes.json();
+        if (!reverseData[0]?.name) throw new Error("City name not found");
+        const city = reverseData[0].name;
+        document.getElementById('cityInput').value = city;
+        currentCity = city;
+
+        // Fetch weather data using coordinates
+        const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${currentUnit}&lang=${currentLang}`;
+        const weatherRes = await fetch(weatherUrl);
+        if (!weatherRes.ok) throw new Error("Weather data not found");
+        const data = await weatherRes.json();
+        rawWeatherData = data;
+        toggleUnitBtn.classList.remove('hidden');
+        displayWeather(data);
+        errEl.textContent = '';
+        await Promise.all([fetchHourlyForecast(lat, lon), fetchAqi(lat, lon)]);
+        startAutoUpdate();
+      } catch (err) {
+        rawWeatherData = null;
+        rawHourlyData = null;
+        clearResult();
+        errEl.textContent = err.message.includes("geolocation") ? labels[currentLang].errorGeolocation : labels[currentLang].errorReverseGeocoding;
+        toggleUnitBtn.classList.add('hidden');
+        stopAutoUpdate();
+        currentWindowStart = null;
+      } finally {
+        getLocationBtn.disabled = false;
+        getLocationBtn.textContent = `📍 ${labels[currentLang].useLocation}`;
         loadingEl.style.display = 'none';
       }
     }
