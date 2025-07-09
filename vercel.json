@@ -3,8 +3,5 @@
     "api/*.js": {
       "runtime": "@vercel/node"
     }
-  },
-  "env": {
-    "OPENWEATHER_API_KEY": "@openweather-api-key"
   }
 }

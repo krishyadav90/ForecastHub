@@ -24,8 +24,9 @@ This project is optimized for Vercel deployment with secure environment variable
    - In your Vercel project dashboard, go to Settings → Environment Variables
    - Add a new variable:
      - **Name**: `OPENWEATHER_API_KEY`
-     - **Value**: Your OpenWeatherMap API key
-     - **Environment**: Production (and Preview if needed)
+     - **Value**: `1c3c7793907527875502baf7509da81f` (your actual API key)
+     - **Environment**: Production, Preview, and Development (select all)
+   - Click "Save"
 
 4. **Deploy**: Click "Deploy" and your app will be live!
 
