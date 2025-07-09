@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A beautiful weather forecast application",
   "main": "index.html",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'No build step required'",
