@@ -1,0 +1,17 @@
+{
+  "name": "forecast-hub",
+  "version": "1.0.0",
+  "description": "A beautiful weather forecast application",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "start": "vercel dev"
+  },
+  "keywords": ["weather", "forecast", "vercel"],
+  "author": "Krish Yadav",
+  "license": "MIT",
+  "devDependencies": {
+    "@vercel/node": "^3.0.0"
+  }
+}

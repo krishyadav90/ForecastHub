@@ -4,6 +4,50 @@ Welcome to **ForecastHub** – a modern, interactive, and responsive web applica
 
 ---
 
+## 🚀 Deploy to Vercel
+
+This project is optimized for Vercel deployment with secure environment variable handling.
+
+### Quick Deploy
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/forecast-hub)
+
+### Manual Deployment Steps:
+
+1. **Fork this repository** to your GitHub account
+
+2. **Connect to Vercel**:
+   - Go to [vercel.com](https://vercel.com)
+   - Sign in with your GitHub account
+   - Click "New Project" and import your forked repository
+
+3. **Set Environment Variable**:
+   - In your Vercel project dashboard, go to Settings → Environment Variables
+   - Add a new variable:
+     - **Name**: `OPENWEATHER_API_KEY`
+     - **Value**: Your OpenWeatherMap API key
+     - **Environment**: Production (and Preview if needed)
+
+4. **Deploy**: Click "Deploy" and your app will be live!
+
+### Local Development:
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/forecast-hub.git
+cd forecast-hub
+
+# Install Vercel CLI (if not already installed)
+npm i -g vercel
+
+# Set up environment variables
+cp .env.local.example .env.local
+# Edit .env.local and add your API key
+
+# Start development server
+vercel dev
+```
+
+---
+
 ## ✨ Key Features
 
 * 🔴 **Real-Time Weather**

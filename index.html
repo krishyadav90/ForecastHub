@@ -959,6 +959,19 @@
         return;
       }
 
+      // Ensure API key is loaded
+      if (!apiKey) {
+        await loadApiKey();
+      }
+
+      if (!apiKey) {
+        errEl.textContent = 'Failed to load API configuration';
+        getWeatherBtn.disabled = false;
+        getWeatherBtn.textContent = labels[currentLang].getWeatherBtn;
+        loadingEl.style.display = 'none';
+        return;
+      }
+
       currentCity = city;
       toggleUnitBtn.classList.add('hidden');
 
@@ -999,6 +1012,19 @@
       getLocationBtn.disabled = true;
       getLocationBtn.textContent = 'Locating...';
       loadingEl.style.display = 'block';
+
+      // Ensure API key is loaded
+      if (!apiKey) {
+        await loadApiKey();
+      }
+
+      if (!apiKey) {
+        errEl.textContent = 'Failed to load API configuration';
+        getLocationBtn.disabled = false;
+        getLocationBtn.textContent = `📍 ${labels[currentLang].useLocation}`;
+        loadingEl.style.display = 'none';
+        return;
+      }
 
       if (!navigator.geolocation) {
         errEl.textContent = labels[currentLang].errorGeolocation;
